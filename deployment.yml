@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
       - name: bms-container
-        image: salauddin817/bms:latest  # Replace with your Docker image
+        image: salauddin817/bms:latest # Replace with your Docker image
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000  # Replace with the port your app runs on
