@@ -107,8 +107,6 @@ pipeline {
 
         stage('Deploy to EKS Cluster') {
             steps {
-                // If using Jenkins AWS credentials instead of an EC2 IAM Role, wrap sh in:
-                // withCredentials([aws(credentialsId: 'aws-creds', region: env.AWS_REGION)]) { ... }
                 sh '''
                     echo "Verifying AWS credentials..."
                     aws sts get-caller-identity
@@ -129,10 +127,16 @@ pipeline {
                     kubectl rollout restart deployment/bms-app
 
                     echo "Checking rollout status..."
-                    kubectl rollout status deployment/bms-app --timeout=180s
+                    if ! kubectl rollout status deployment/bms-app --timeout=300s; then
+                        echo "Rollout failed or timed out! Fetching pod diagnostics..."
+                        kubectl get pods -o wide
+                        kubectl describe pods -l app=bms
+                        kubectl logs -l app=bms --tail=50 || true
+                        exit 1
+                    fi
 
                     echo "Verifying deployment..."
-                    kubectl get pods
+                    kubectl get pods -o wide
                     kubectl get svc
                 '''
             }
