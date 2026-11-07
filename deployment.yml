@@ -6,6 +6,11 @@ metadata:
     app: bms
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: bms
@@ -15,8 +20,8 @@ spec:
         app: bms
     spec:
       containers:
-      - name: bms-container
-        image: salauddin817/bms:latest # Replace with your Docker image
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3000  # Replace with the port your app runs on
+        - name: bms-container
+          image: salauddin817/bms:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
